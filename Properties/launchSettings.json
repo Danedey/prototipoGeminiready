@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "Windows Machine": {
+      "commandName": "MsixPackage",
+      "nativeDebugging": false,
+      "environmentVariables": {
+        "CASSANDRA_HOST": "127.0.0.1",
+        "CASSANDRA_PORT": "9042",
+        "CASSANDRA_KEYSPACE": "chatbot_fiscal"
+      }
+    }
+  }
+}

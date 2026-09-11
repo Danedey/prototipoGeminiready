@@ -1,0 +1,17 @@
+# Build output
+bin/
+obj/
+
+# Visual Studio user and cache files
+.vs/
+*.user
+*.suo
+
+# Local secrets and environment files
+.env
+.env.*
+!.env.example
+
+# OS files
+.DS_Store
+Thumbs.db

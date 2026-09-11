@@ -1,0 +1,187 @@
+﻿@page "/Olvidarcontrasena"
+@inject NavigationManager Navigation
+@inject AlertService AlertService
+
+
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        .form-container {
+            padding: 20px;
+            margin: auto;
+            max-width: 400px;
+            text-align: left;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            color: #007BFF;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1rem;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        form label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        form input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #007BFF;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 1rem;
+        }
+
+            form input:focus {
+                outline: none;
+                border-color: #0056b3;
+            }
+
+        .btn-submit {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: 15px solid #007BFF; /* Borde azul de 15px */
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+            .btn-submit:hover {
+                background-color: #0056b3;
+                border-color: #0056b3; /* Cambia el borde a un azul más oscuro */
+            }
+
+        .btn-submit-gray {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #E8EDF2;
+            color: black;
+            border: 15px solid #E8EDF2; /* Borde azul de 15px */
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+            .btn-submit-gray:hover {
+                background-color: #637587;
+                border-color: #637587; /* Cambia el borde a un azul más oscuro */
+            }
+
+        .button {
+            display: block;
+            width: 90%;
+            margin: 10px auto;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .button-blue {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+            .button-blue:hover {
+                background-color: #0056b3;
+                transform: scale(1.05);
+                box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+            }
+
+        .button-gray {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+
+            .button-gray:hover {
+                background-color: #d6d6d6;
+                transform: scale(1.05);
+                box-shadow: 0 4px 8px rgba(200, 200, 200, 0.3);
+            }
+
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <header>
+            <h1>Crear un cuenta</h1>
+
+        </header>
+        <form>
+
+            <input type="text" placeholder="RFC" @bind-value=rfc />
+
+            <button type="button" class="button button-blue" @onclick="introducir_Clik">Introducir</button>
+            <button type="button" class="button button-gray" @onclick="atras">Atras</button>
+        </form>
+    </div>
+
+
+</body>
+</html>
+
+
+@code {
+    
+    string rfc = string.Empty;
+    
+    bool EsValido(string texto)
+    {
+        return texto.Length >= 12 && texto.Length <= 13 && !texto.Contains(" ");
+    }
+
+    public async Task introducir_Clik()
+    {
+        if (string.IsNullOrWhiteSpace(rfc))
+        {
+            await AlertService.ShowAlertAsync("Advertencia", "Rfc no valida", "OK");
+            return;
+        }
+        if (!EsValido(rfc))
+        {
+            await AlertService.ShowAlertAsync("Advertencia", "No se cumple el formato de un rfc", "OK");
+            return;
+        }
+
+        Navigation.NavigateTo("/");
+    }
+
+    private void atras()
+    {
+        Navigation.NavigateTo("/");
+    }
+
+}

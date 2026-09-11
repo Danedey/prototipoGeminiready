@@ -1,0 +1,311 @@
+﻿@using System.Collections.Generic
+@using prototipoGeminiready.Services
+@page "/MainChat"
+@inject NavigationManager Navigation
+@inject GeminiService Gemini
+@inject GeminiService GeminiService
+@inject ChatService ChatService
+@inject UsuarioService UsuarioService
+
+
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro</title>
+    <style>
+        body {
+        font-family: 'Arial', sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f9f9f9;
+        color: #333;
+        }
+
+        .form-container {
+        padding: 20px;
+        margin: auto;
+        max-width: 1000px; /* antes era 400px */
+        text-align: left;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+
+        header h1 {
+        font-size: 1.8rem;
+        color: #007BFF;
+        margin-bottom: 10px;
+        }
+
+        header p {
+        font-size: 1rem;
+        color: #555;
+        margin-bottom: 20px;
+        }
+
+        form label {
+        display: block;
+        margin: 10px 0 5px;
+        font-weight: bold;
+        color: #333;
+        }
+
+        .input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #007BFF;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        font-size: 1rem;
+        }
+
+        .input:focus {
+        outline: none;
+        border-color: #0056b3;
+        }
+
+        .input-rfc {
+        width: 100%;
+        height: 300px;
+        padding: 10px;
+        border: 1px solid black;
+        border-radius: 10px;
+        font-size: 1rem;
+        color: #000;
+        resize: vertical;
+        overflow-y: auto;
+        }
+
+
+        .input-rfc:focus {
+        outline: none;
+        border-color: #333;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-submit {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        background-color: #007BFF;
+        color: white;
+        border: 15px solid #007BFF; /* Borde azul de 15px */
+        border-radius: 10px;
+        font-size: 1rem;
+        cursor: pointer;
+        }
+
+        .btn-submit:hover {
+        background-color: #0056b3;
+        border-color: #0056b3; /* Cambia el borde a un azul más oscuro */
+        }
+
+        .btn-submit-gray {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        background-color: #E8EDF2;
+        color: black;
+        border: 15px solid #E8EDF2; /* Borde azul de 15px */
+        border-radius: 10px;
+        font-size: 1rem;
+        cursor: pointer;
+        }
+
+        .btn-submit-gray:hover {
+        background-color: #637587;
+        border-color: #637587; /* Cambia el borde a un azul más oscuro */
+        }
+
+        .button {
+        display: block;
+        width: 90%;
+        margin: 10px auto;
+        padding: 15px;
+        font-size: 16px;
+        font-weight: bold;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .button-blue {
+        background-color: #007bff;
+        color: #fff;
+        }
+
+        .button-blue:hover {
+        background-color: #0056b3;
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+        }
+
+        .button-gray {
+        background-color: #e0e0e0;
+        color: #333;
+        }
+
+        .button-gray:hover {
+        background-color: #d6d6d6;
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(200, 200, 200, 0.3);
+        }
+
+        .boton-fijo {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease;
+        }
+
+            .boton-fijo:hover {
+                background-color: #0056b3;
+            }
+
+
+    </style>
+</head>
+<body>
+    <button class="boton-fijo" @onclick="MiAccion">🔔</button>
+
+    <div class="form-container">
+        <header>
+            <h1>TaxChat</h1>
+
+        </header>
+        <div>
+
+
+            <textarea class="input-rfc" readonly>@Respuesta</textarea>
+
+            <input  class="input" @bind="Pregunta" placeholder="Haz una pregunta" />
+
+            <button type="button" class="button button-blue" @onclick="Enviar">Enviar</button>
+
+            <h3 class="text-center text-2xl font-semibold mb-4">Preguntas recomendadas</h3>
+
+            @if (preguntasVisibles != null)
+            {
+                <div class="flex justify-center">
+                    <ul class="w-full max-w-xl space-y-2">
+                        @foreach (var pregunta in preguntasVisibles)
+                        {
+                            <li>
+                                <button class="bg-gray-200 hover:bg-gray-300 text-black font-medium py-2 px-4 rounded w-full text-left"
+                                @onclick="() => SeleccionarPregunta(pregunta)">
+                                    @pregunta
+                                </button>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+
+            <hr class="my-6" />
+
+            <h4 class="text-lg font-semibold mb-2">Pregunta seleccionada:</h4>
+            <InputText @bind-Value="preguntaSeleccionada" class="border border-gray-400 p-2 w-full max-w-xl" />
+
+
+        </div>
+    </div>
+
+
+</body>
+</html>
+
+
+@code {
+    Guid sesionActual = Guid.NewGuid(); // solo si no estás generándolo en otro lado
+    DateTime inicioSesion = DateTime.UtcNow;
+    string rfcUsuario = "RFC_DEL_USUARIO"; // este lo puedes obtener desde login o sesión actual
+
+    string Pregunta = "";
+    string Respuesta = "";
+    private List<string> todasLasPreguntas = new()
+    {
+        "¿Cómo armar un presupuesto mensual efectivo?",
+        "¿Qué porcentaje de mis ingresos debo ahorrar?",
+        "¿Qué es el fondo de emergencia y cuánto debo tener?",
+        "¿Cómo reducir mis gastos sin afectar mi calidad de vida?",
+        "¿Es mejor pagar deudas o ahorrar primero?",
+        "¿Cómo salgo más rápido de mis deudas?",
+        "¿Cómo funciona el buró de crédito y cómo afecta mi historial?",
+        "¿Qué es el CAT (Costo Anual Total) y por qué importa?",
+        "¿Cuándo conviene consolidar mis deudas?",
+        "¿Cuál es el riesgo de pagar solo el mínimo en una tarjeta de crédito?",
+        "¿Dónde puedo invertir dinero en México con bajo riesgo?",
+        "¿Qué son los CETES y cómo funcionan?",
+        "¿Qué diferencia hay entre inversión a corto y largo plazo?",
+        "¿Qué perfil de riesgo tengo como inversionista?",
+        "¿Qué plataformas seguras existen para invertir en México?",
+        "¿Qué es un estado de resultados y cómo se interpreta?",
+        "¿Qué es un balance general?",
+        "¿Qué es la contabilidad de costos?",
+        "¿Cuál es la diferencia entre activo y pasivo?",
+        "¿Qué es el flujo de efectivo y por qué es importante?",
+        "¿Cómo llevar la contabilidad de mi negocio pequeño?",
+        "¿Qué software gratuito o barato puedo usar para contabilidad personal?",
+        "¿Qué documentos debo guardar para mi contabilidad?",
+        "¿Qué es una póliza contable?",
+        "¿Qué es la conciliación bancaria?",
+        "¿Qué régimen fiscal me conviene si soy freelance?",
+        "¿Cuál es la diferencia entre RESICO y Persona Física con Actividad Empresarial?",
+        "¿Cómo emito una factura (CFDI)?",
+        "¿Cuánto debo pagar de impuestos si soy independiente?",
+        "¿Cómo me doy de alta en el SAT?",
+        "¿Cuándo se presenta la declaración anual?",
+        "¿Qué puedo deducir en mi declaración anual?",
+        "¿Qué pasa si no presento mis declaraciones?",
+        "¿Cómo presento mis declaraciones mensuales?",
+        "¿Cómo me ayuda un contador y cuánto cobra generalmente?",
+        "¿Cómo planificar para el retiro en México?",
+        "¿Qué es una AFORE y cómo sé cuál tengo?",
+        "¿Qué tipo de seguro financiero me conviene (vida, gastos médicos)?",
+        "¿Cómo empiezo un fondo para la educación de mis hijos?",
+        "¿Qué debo hacer antes de pedir un crédito hipotecario?"
+    };
+
+    private List<string> preguntasVisibles = new();
+    private string preguntaSeleccionada = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        preguntasVisibles = todasLasPreguntas.Take(10).ToList();
+    }
+
+    private void SeleccionarPregunta(string pregunta)
+    {
+        preguntaSeleccionada = pregunta;
+        Pregunta = pregunta;
+       
+    }
+
+    private void MiAccion()
+    {
+        // Ejemplo: regresar al inicio
+        Navigation.NavigateTo("/Cambiarcontrasena");
+    }
+
+
+    async Task Enviar()
+    {
+        Respuesta = "Cargando...";
+        Respuesta = await Gemini.EnviarPreguntaAsync(Pregunta);
+    }
+}
